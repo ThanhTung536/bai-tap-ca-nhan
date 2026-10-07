@@ -41,7 +41,7 @@ fun homescreen() {
     var num2 by remember { mutableStateOf("") }
     var selectedOperator by remember { mutableStateOf<String?>(null) }
 
-    // Tính toán kết quả
+    // Tính toán
     val result = remember(num1, num2, selectedOperator) {
         val n1 = num1.toDoubleOrNull()
         val n2 = num2.toDoubleOrNull()
@@ -88,7 +88,7 @@ fun homescreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Hàng nút chọn phép tính (+, -, *, /)
+        // Hàng nút chọn phép tính
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -135,8 +135,6 @@ fun homescreen() {
         }
     }
 }
-
-// Đưa hàm CalculatorButton ra ngoài hẳn các hàm khác (Nằm ngang hàng với homescreen)
 @Composable
 fun CalculatorButton(
     symbol: String,
@@ -147,7 +145,7 @@ fun CalculatorButton(
     Box(
         modifier = Modifier
             .size(64.dp)
-            .clip(RoundedCornerShape(8.dp)) // Đã thêm dấu chấm ở đây
+            .clip(RoundedCornerShape(8.dp))
             .background(bgColor)
             .then(if (isSelect) Modifier.border(2.dp, Color.Black, RoundedCornerShape(8.dp)) else Modifier)
             .clickable { onClick() },
