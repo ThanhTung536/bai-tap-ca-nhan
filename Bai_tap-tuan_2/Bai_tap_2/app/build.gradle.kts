@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bai_tap_1"
+    namespace = "com.example.bai_tap_2"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.bai_tap_1"
+        applicationId = "com.example.bai_tap_2"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -38,7 +38,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
