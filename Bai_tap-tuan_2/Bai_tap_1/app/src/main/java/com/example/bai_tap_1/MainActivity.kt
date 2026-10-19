@@ -29,14 +29,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Bai_tap_1Theme {
-                homescreen()
+                Homescreen()
             }
         }
     }
 }
 
 @Composable
-fun homescreen() {
+fun Homescreen() {
     var num1 by remember { mutableStateOf("") }
     var num2 by remember { mutableStateOf("") }
     var selectedOperator by remember { mutableStateOf<String?>(null) }
@@ -164,6 +164,6 @@ fun CalculatorButton(
 @Composable
 fun GreetingPreview() {
     Bai_tap_1Theme {
-        homescreen()
+        Homescreen()
     }
 }

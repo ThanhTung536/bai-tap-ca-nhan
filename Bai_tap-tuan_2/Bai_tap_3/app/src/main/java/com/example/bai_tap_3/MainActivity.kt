@@ -84,18 +84,7 @@ fun GradeScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .padding(20.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Điểm trung bình", fontSize = 14.sp, color = Color.Gray)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = mainScore.toString(),
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
+                           fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(16.dp))

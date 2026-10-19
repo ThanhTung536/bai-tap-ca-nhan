@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
             Bai_tap_2Theme {
                 StudentScreen()
             }
-        }
+
     }
 }
 
