@@ -1,0 +1,66 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Outer circle -->
+    <path
+        android:fillColor="#1A5276"
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0"/>
+
+    <!-- Inner circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,60m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0"/>
+
+    <!-- Inner blue circle -->
+    <path
+        android:fillColor="#1A5276"
+        android:pathData="M60,60m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0"/>
+
+    <!-- White inner -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,60m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
+
+    <!-- UTH Text background -->
+    <path
+        android:fillColor="#8B0000"
+        android:pathData="M30,35 L90,35 L90,60 L30,60 Z"/>
+
+    <!-- U letter -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,40 L38,52 Q38,56 42,56 Q46,56 46,52 L46,40 L44,40 L44,52 Q44,54 42,54 Q40,54 40,52 L40,40 Z"/>
+
+    <!-- T letter -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,40 L62,40 L62,42 L57,42 L57,56 L55,56 L55,42 L50,42 Z"/>
+
+    <!-- H letter -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66,40 L68,40 L68,46 L74,46 L74,40 L76,40 L76,56 L74,56 L74,48 L68,48 L68,56 L66,56 Z"/>
+
+    <!-- Small text area -->
+    <path
+        android:fillColor="#1A5276"
+        android:pathData="M30,62 L90,62 L90,85 L30,85 Z"/>
+
+    <!-- UNIVERSITY text line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,66 L85,66 L85,68 L35,68 Z"/>
+
+    <!-- OF TRANSPORT text line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,71 L82,71 L82,73 L38,73 Z"/>
+
+    <!-- HO CHI MINH CITY text line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,76 L85,76 L85,78 L35,78 Z"/>
+</vector>
