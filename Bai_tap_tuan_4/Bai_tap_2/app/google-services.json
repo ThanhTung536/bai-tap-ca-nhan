@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "816920847777",
+    "project_id": "uth-todo-37b80",
+    "storage_bucket": "uth-todo-37b80.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816920847777:android:8e34297a55a3db89c597e0",
+        "android_client_info": {
+          "package_name": "com.example.bai_tap_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQonmhclwUhkreX_08auwbPDI_X6QQFDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
