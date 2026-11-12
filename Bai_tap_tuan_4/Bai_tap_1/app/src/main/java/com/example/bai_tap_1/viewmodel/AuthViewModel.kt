@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.example.bai_tap_1.network.TaskApiService
 import com.example.bai_tap_1.service.FirebaseManager
@@ -126,14 +127,45 @@ class AuthViewModel : ViewModel() {
     var authSuccessMessage by mutableStateOf<String?>(null)
         private set
 
-    val notifications = mutableStateListOf(
+    private val initialNotifications = listOf(
         NotificationItem("1", "Sắp đến hạn", "Ôn chương 3 – Cấu trúc dữ liệu lúc 14:00.", "13:45", NotificationType.UPCOMING, isRead = false),
         NotificationItem("2", "Đã quá hạn", "Bài đọc tham khảo môn Mạng máy tính chưa xong.", "10:10", NotificationType.OVERDUE, isRead = false),
         NotificationItem("3", "Làm tốt lắm!", "Bạn đã xong 2 việc trong sáng nay.", "11:30", NotificationType.SUCCESS, isRead = true),
         NotificationItem("4", "Nhắc việc", "Họp nhóm đồ án trong tuần này.", "Hôm qua", NotificationType.REMINDER, isRead = true)
     )
 
+    val notifications = mutableStateListOf<NotificationItem>().apply {
+        addAll(initialNotifications)
+    }
+
+    private var notificationClearJob: Job? = null
+    private var hasStartedScreenNotificationTimer = false
+
     val unreadNotificationsCount: Int get() = notifications.count { !it.isRead }
+
+    /**
+     * Sau 10 giây, cho danh sách thông báo về rỗng để hiển thị giao diện emptyView.
+     */
+    fun startNotificationClearTimer() {
+        try {
+            notificationClearJob?.cancel()
+            notificationClearJob = viewModelScope.launch {
+                delay(10_000L)
+                notifications.clear()
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
+    fun onNotificationScreenShown() {
+        if (!hasStartedScreenNotificationTimer) {
+            hasStartedScreenNotificationTimer = true
+            if (notifications.isEmpty()) {
+                notifications.addAll(initialNotifications)
+            }
+            startNotificationClearTimer()
+        }
+    }
 
     fun markAllNotificationsAsRead() {
         notifications.forEachIndexed { idx, item ->
@@ -237,6 +269,7 @@ class AuthViewModel : ViewModel() {
 
     init {
         fetchTasksFromApi()
+        startNotificationClearTimer()
     }
 
     fun fetchTasksFromApi() {
