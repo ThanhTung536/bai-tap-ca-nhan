@@ -18,6 +18,12 @@ interface TaskApiService {
         @Header("Authorization") token: String = "Bearer TuanTruong-uth-student"
     ): Response<TaskDto>
 
+    @POST("mock/teach/tasks")
+    suspend fun createTask(
+        @Body task: TaskDto,
+        @Header("Authorization") token: String = "Bearer TuanTruong-uth-student"
+    ): Response<TaskDto>
+
     @PATCH("mock/teach/tasks/{id}")
     suspend fun updateTask(
         @Path("id") taskId: String,

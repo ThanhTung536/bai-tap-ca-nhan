@@ -186,7 +186,7 @@ fun TaskDetailScreen(
                                     )
                                     Text("Hạn chót", color = UthDarkText, fontSize = 14.sp)
                                 }
-                                Text("Hôm nay, ${task.time}", color = UthDarkText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                Text("${task.date}, ${task.time}", color = UthDarkText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
 

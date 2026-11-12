@@ -27,30 +27,29 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bai_tap_1.ui.theme.*
+import com.example.bai_tap_1.viewmodel.AddTaskViewModel
 import com.example.bai_tap_1.viewmodel.AuthViewModel
 import java.util.Locale
 
 @Composable
 fun AddTaskScreen(
     viewModel: AuthViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    addTaskViewModel: AddTaskViewModel = viewModel()
 ) {
-    var taskTitle by remember { mutableStateOf("") }
-    var taskNote by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("Học tập") }
-    var selectedDate by remember { mutableStateOf("Hôm nay") }
-
-    var isTimePopupExpanded by remember { mutableStateOf(false) }
-    var selectedHour by remember { mutableStateOf("07") }
-    var selectedMinute by remember { mutableStateOf("00") }
-    var selectedPeriod by remember { mutableStateOf("CH") }
-    var taskTime by remember { mutableStateOf("07:00 CH") }
-
-    var isReminderEnabled by remember { mutableStateOf(true) }
-    var selectedPriority by remember { mutableStateOf("Vừa") }
-
-    val isFormValid = taskTitle.isNotBlank()
+    val taskTitle = addTaskViewModel.taskTitle
+    val taskNote = addTaskViewModel.taskNote
+    val selectedCategory = addTaskViewModel.selectedCategory
+    val selectedDate = addTaskViewModel.selectedDate
+    val isTimePopupExpanded = addTaskViewModel.isTimePopupExpanded
+    val selectedHour = addTaskViewModel.selectedHour
+    val selectedMinute = addTaskViewModel.selectedMinute
+    val taskTime = addTaskViewModel.taskTime
+    val isReminderEnabled = addTaskViewModel.isReminderEnabled
+    val selectedPriority = addTaskViewModel.selectedPriority
+    val isFormValid = addTaskViewModel.isFormValid
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -84,7 +83,10 @@ fun AddTaskScreen(
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable { onBack() }
+                            .clickable {
+                                addTaskViewModel.resetForm()
+                                onBack()
+                            }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
 
@@ -103,13 +105,10 @@ fun AddTaskScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .clickable(enabled = isFormValid) {
-                                viewModel.addNewTask(
-                                    title = taskTitle,
-                                    category = selectedCategory,
-                                    time = taskTime
+                                addTaskViewModel.submitNewTask(
+                                    authViewModel = viewModel,
+                                    onComplete = onBack
                                 )
-                                viewModel.showTopNotification("Đã thêm công việc mới thành công!")
-                                onBack()
                             }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -131,8 +130,14 @@ fun AddTaskScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             TextField(
                                 value = taskTitle,
-                                onValueChange = { taskTitle = it },
-                                placeholder = { Text("Ví dụ: Ôn chương 4 – Giải thuật", color = UthSubText.copy(alpha = 0.6f), fontSize = 14.sp) },
+                                onValueChange = { addTaskViewModel.onTitleChange(it) },
+                                placeholder = {
+                                    Text(
+                                        "Ví dụ: Ôn chương 4 – Giải thuật",
+                                        color = UthSubText.copy(alpha = 0.6f),
+                                        fontSize = 14.sp
+                                    )
+                                },
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
@@ -151,8 +156,14 @@ fun AddTaskScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             TextField(
                                 value = taskNote,
-                                onValueChange = { taskNote = it },
-                                placeholder = { Text("Thêm ghi chú (không bắt buộc)", color = UthSubText.copy(alpha = 0.6f), fontSize = 14.sp) },
+                                onValueChange = { addTaskViewModel.onNoteChange(it) },
+                                placeholder = {
+                                    Text(
+                                        "Thêm ghi chú (không bắt buộc)",
+                                        color = UthSubText.copy(alpha = 0.6f),
+                                        fontSize = 14.sp
+                                    )
+                                },
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
@@ -185,7 +196,7 @@ fun AddTaskScreen(
                                         color = if (isSelected) UthPrimaryBlue else UthBorderColor,
                                         shape = RoundedCornerShape(12.dp)
                                     )
-                                    .clickable { selectedCategory = cat },
+                                    .clickable { addTaskViewModel.onCategoryChange(cat) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -219,7 +230,7 @@ fun AddTaskScreen(
                                         color = if (isSelected) UthPrimaryBlue else UthBorderColor,
                                         shape = RoundedCornerShape(12.dp)
                                     )
-                                    .clickable { selectedDate = dt },
+                                    .clickable { addTaskViewModel.onDateChange(dt) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -264,15 +275,25 @@ fun AddTaskScreen(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(Color(0xFFF1F5F9))
-                                        .clickable { isTimePopupExpanded = !isTimePopupExpanded }
+                                        .clickable { addTaskViewModel.toggleTimePopup() }
                                         .padding(horizontal = 12.dp, vertical = 6.dp)
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                                     ) {
-                                        Text(taskTime, color = UthDarkText, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                                        Icon(Icons.Default.AccessTime, contentDescription = null, tint = UthSubText, modifier = Modifier.size(14.dp))
+                                        Text(
+                                            taskTime,
+                                            color = UthDarkText,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Icon(
+                                            Icons.Default.AccessTime,
+                                            contentDescription = null,
+                                            tint = UthSubText,
+                                            modifier = Modifier.size(14.dp)
+                                        )
                                     }
                                 }
 
@@ -280,18 +301,22 @@ fun AddTaskScreen(
                                     Popup(
                                         alignment = Alignment.TopEnd,
                                         offset = IntOffset(0, 110),
-                                        onDismissRequest = { isTimePopupExpanded = false }
+                                        onDismissRequest = { addTaskViewModel.toggleTimePopup(false) }
                                     ) {
                                         Surface(
                                             modifier = Modifier
-                                                .width(180.dp)
+                                                .width(150.dp)
                                                 .height(250.dp),
                                             shape = RoundedCornerShape(8.dp),
                                             color = Color.White,
                                             shadowElevation = 8.dp,
                                             border = BorderStroke(1.dp, Color(0xFFCBD5E1))
                                         ) {
-                                            Column(modifier = Modifier.fillMaxSize().padding(4.dp)) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(4.dp)
+                                            ) {
                                                 Row(
                                                     modifier = Modifier.fillMaxWidth(),
                                                     horizontalArrangement = Arrangement.spacedBy(2.dp)
@@ -303,7 +328,12 @@ fun AddTaskScreen(
                                                             .background(Color(0xFF007AFF)),
                                                         contentAlignment = Alignment.Center
                                                     ) {
-                                                        Text(selectedHour, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                        Text(
+                                                            selectedHour,
+                                                            color = Color.White,
+                                                            fontWeight = FontWeight.Bold,
+                                                            fontSize = 13.sp
+                                                        )
                                                     }
                                                     Box(
                                                         modifier = Modifier
@@ -312,16 +342,12 @@ fun AddTaskScreen(
                                                             .background(Color(0xFF007AFF)),
                                                         contentAlignment = Alignment.Center
                                                     ) {
-                                                        Text(selectedMinute, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                                    }
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .height(32.dp)
-                                                            .background(Color(0xFF007AFF)),
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Text(selectedPeriod, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                        Text(
+                                                            selectedMinute,
+                                                            color = Color.White,
+                                                            fontWeight = FontWeight.Bold,
+                                                            fontSize = 13.sp
+                                                        )
                                                     }
                                                 }
 
@@ -336,8 +362,9 @@ fun AddTaskScreen(
                                                         modifier = Modifier.weight(1f),
                                                         horizontalAlignment = Alignment.CenterHorizontally
                                                     ) {
-                                                        val hours = (1..12).map { String.format(
-                                                            Locale.US, "%02d", it) }
+                                                        val hours = (0..23).map {
+                                                            String.format(Locale.US, "%02d", it)
+                                                        }
                                                         items(hours) { h ->
                                                             Text(
                                                                 text = h,
@@ -347,8 +374,7 @@ fun AddTaskScreen(
                                                                 modifier = Modifier
                                                                     .fillMaxWidth()
                                                                     .clickable {
-                                                                        selectedHour = h
-                                                                        taskTime = "$selectedHour:$selectedMinute $selectedPeriod"
+                                                                        addTaskViewModel.onHourSelected(h)
                                                                     }
                                                                     .padding(vertical = 4.dp),
                                                                 textAlign = TextAlign.Center
@@ -360,8 +386,9 @@ fun AddTaskScreen(
                                                         modifier = Modifier.weight(1f),
                                                         horizontalAlignment = Alignment.CenterHorizontally
                                                     ) {
-                                                        val minutes = (0..59).map { String.format(
-                                                            Locale.US, "%02d", it) }
+                                                        val minutes = (0..59).map {
+                                                            String.format(Locale.US, "%02d", it)
+                                                        }
                                                         items(minutes) { m ->
                                                             Text(
                                                                 text = m,
@@ -371,33 +398,10 @@ fun AddTaskScreen(
                                                                 modifier = Modifier
                                                                     .fillMaxWidth()
                                                                     .clickable {
-                                                                        selectedMinute = m
-                                                                        taskTime = "$selectedHour:$selectedMinute $selectedPeriod"
+                                                                        addTaskViewModel.onMinuteSelected(m)
+                                                                        addTaskViewModel.toggleTimePopup(false)
                                                                     }
                                                                     .padding(vertical = 4.dp),
-                                                                textAlign = TextAlign.Center
-                                                            )
-                                                        }
-                                                    }
-
-                                                    Column(
-                                                        modifier = Modifier.weight(1f),
-                                                        horizontalAlignment = Alignment.CenterHorizontally
-                                                    ) {
-                                                        listOf("CH", "SA").forEach { p ->
-                                                            Text(
-                                                                text = p,
-                                                                fontSize = 12.sp,
-                                                                fontWeight = if (p == selectedPeriod) FontWeight.Bold else FontWeight.Normal,
-                                                                color = if (p == selectedPeriod) Color(0xFF007AFF) else UthDarkText,
-                                                                modifier = Modifier
-                                                                    .fillMaxWidth()
-                                                                    .clickable {
-                                                                        selectedPeriod = p
-                                                                        taskTime = "$selectedHour:$selectedMinute $selectedPeriod"
-                                                                        isTimePopupExpanded = false
-                                                                    }
-                                                                    .padding(vertical = 6.dp),
                                                                 textAlign = TextAlign.Center
                                                             )
                                                         }
@@ -438,7 +442,7 @@ fun AddTaskScreen(
 
                             Switch(
                                 checked = isReminderEnabled,
-                                onCheckedChange = { isReminderEnabled = it },
+                                onCheckedChange = { addTaskViewModel.onReminderChange(it) },
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = Color.White,
                                     checkedTrackColor = Color(0xFF22C55E)
@@ -466,7 +470,7 @@ fun AddTaskScreen(
                             priorities.forEach { prio ->
                                 val isSelected = selectedPriority == prio
                                 Surface(
-                                    onClick = { selectedPriority = prio },
+                                    onClick = { addTaskViewModel.onPriorityChange(prio) },
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight(),
@@ -494,20 +498,17 @@ fun AddTaskScreen(
             Button(
                 onClick = {
                     if (isFormValid) {
-                        viewModel.addNewTask(
-                            title = taskTitle,
-                            category = selectedCategory,
-                            time = taskTime
+                        addTaskViewModel.submitNewTask(
+                            authViewModel = viewModel,
+                            onComplete = onBack
                         )
-                        viewModel.showTopNotification("Đã thêm công việc mới thành công!")
-                        onBack()
                     }
                 },
                 enabled = isFormValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(25.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = UthPrimaryBlue,
                     disabledContainerColor = Color(0xFFE2E8F0)
@@ -529,5 +530,6 @@ fun AddTaskScreen(
 @Composable
 fun AddTaskScreenPreview() {
     val dummyVm = remember { AuthViewModel() }
-    AddTaskScreen(viewModel = dummyVm, onBack = {})
+    val dummyAddVm = remember { AddTaskViewModel() }
+    AddTaskScreen(viewModel = dummyVm, onBack = {}, addTaskViewModel = dummyAddVm)
 }

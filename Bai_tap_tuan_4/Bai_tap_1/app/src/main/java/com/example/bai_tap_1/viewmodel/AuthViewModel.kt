@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.example.bai_tap_1.network.TaskApiService
+import com.example.bai_tap_1.network.TaskDto
 import com.example.bai_tap_1.service.FirebaseManager
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
@@ -48,6 +49,7 @@ data class TaskItem(
     val category: String,
     val time: String,
     var isCompleted: Boolean,
+    val date: String = "Hôm nay",
     val note: String = "Tập trung phần cây nhị phân và bảng băm.",
     val priority: String = "vừa",
     val remindText: String = "Trước 15 phút",
@@ -289,8 +291,12 @@ class AuthViewModel : ViewModel() {
                                         id = dto.id.toString(),
                                         title = dto.title,
                                         category = mappedCategory,
-                                        time = dto.time,
-                                        isCompleted = dto.done
+                                        time = dto.time.ifBlank { "19:00" },
+                                        isCompleted = dto.done,
+                                        date = dto.date.ifBlank { "Hôm nay" },
+                                        note = dto.note.ifBlank { "Chưa có ghi chú" },
+                                        priority = dto.priority.ifBlank { "vừa" },
+                                        remindText = if (dto.remind) "Trước 15 phút" else "Không nhắc"
                                     )
                                 )
                             }
@@ -334,17 +340,50 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun addNewTask(title: String, category: String, time: String) {
+    fun addNewTask(
+        title: String,
+        category: String,
+        time: String,
+        note: String = "",
+        date: String = "Hôm nay",
+        priority: String = "vừa",
+        isRemindEnabled: Boolean = true
+    ) {
         if (title.isBlank()) return
         val newTask = TaskItem(
             id = System.currentTimeMillis().toString(),
             title = title,
             category = category,
             time = time,
-            isCompleted = false
+            isCompleted = false,
+            date = date,
+            note = note.ifBlank { "Chưa có ghi chú" },
+            priority = priority.lowercase(),
+            remindText = if (isRemindEnabled) "Trước 15 phút" else "Không nhắc"
         )
         _tasks.add(newTask)
         firebaseManager?.saveTaskToFirestore(newTask) {}
+        try {
+            viewModelScope.launch {
+                try {
+                    val apiCategory = if (category == "Cuộc sống") "life" else "study"
+                    val dto = TaskDto(
+                        title = title,
+                        note = note,
+                        category = apiCategory,
+                        date = date,
+                        time = time,
+                        priority = priority.lowercase(),
+                        remind = isRemindEnabled,
+                        done = false
+                    )
+                    TaskApiService.create().createTask(dto)
+                } catch (t: Throwable) {
+                    Log.e("AuthViewModel", "Create task API error: ${t.message}")
+                }
+            }
+        } catch (_: Throwable) {
+        }
     }
 
     fun loginWithGoogle(onSuccess: () -> Unit) {
